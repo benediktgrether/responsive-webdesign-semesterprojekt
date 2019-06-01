@@ -9,6 +9,7 @@ import time
 from neopixel import *
 import argparse
 from flask import Flask
+import random
 
 app = Flask(__name__)
 
@@ -29,96 +30,83 @@ leds = {
     'green': (255, 0, 0)
 }
 
+userColor = 65280
+# print("User Color initialized")
+# print(userColor)
+
+
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
+    userColor = color
+    print("here is your user Color")
+    print(userColor)
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
-        #print(i);
         strip.setPixelColor(i, color)
         strip.show()
         time.sleep(wait_ms/1000.0)
 
 
-# def theaterChase(strip, color, wait_ms=50, iterations=10):
-#     """Movie theater light style chaser animation."""
-#     for j in range(iterations):
-#         for q in range(3):
-#             for i in range(0, strip.numPixels(), 3):
-#                 strip.setPixelColor(i+q, color)
-#             strip.show()
-#             time.sleep(wait_ms/1000.0)
-#             for i in range(0, strip.numPixels(), 3):
-#                 strip.setPixelColor(i+q, 0)
+def setRandomColor(strip, color, wait_ms=50):
+    randomInt = random.randint(1, 60)
+    print("get userColor in Random function")
+    print(userColor)
+    # strip.setPixelColor(randomInt, color)
+    # strip.show()
+    j = 59
+    for i in range(strip.numPixels()):
+        if i <= j:
+            strip.setPixelColor((j - i), color)
+            strip.show()
+            time.sleep(wait_ms/1000.0)
+            #strip.setPixelColor((j - i), userColor)
+            #strip.show()
+            #time.sleep(wait_ms/1000.0)
+        #strip.setPixelColor(i, color)
+        #strip.show()
+    for k in range(strip.numPixels()):
+        if k <= j:
+            strip.setPixelColor((j - k), userColor)
+            strip.show()
+            time.sleep(wait_ms/1000.0)
+    strip.setPixelColor(randomInt, color)
+    strip.show()
 
-
-# def wheel(pos):
-#     """Generate rainbow colors across 0-255 positions."""
-#     if pos < 85:
-#         return Color(pos * 3, 255 - pos * 3, 0)
-#     elif pos < 170:
-#         pos -= 85
-#         return Color(255 - pos * 3, 0, pos * 3)
-#     else:
-#         pos -= 170
-#         return Color(0, pos * 3, 255 - pos * 3)
-
-
-# def rainbow(strip, wait_ms=20, iterations=1):
-#     """Draw rainbow that fades across all pixels at once."""
-#     for j in range(256*iterations):
-#         for i in range(strip.numPixels()):
-#             strip.setPixelColor(i, wheel((i+j) & 255))
-#         strip.show()
-#         time.sleep(wait_ms/1000.0)
-
-
-# def rainbowCycle(strip, wait_ms=20, iterations=5):
-#     """Draw rainbow that uniformly distributes itself across all pixels."""
-#     for j in range(256*iterations):
-#         for i in range(strip.numPixels()):
-#             strip.setPixelColor(
-#                 i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
-#         strip.show()
-#         time.sleep(wait_ms/1000.0)
-
-
-# def theaterChaseRainbow(strip, wait_ms=50):
-#     """Rainbow movie theater light style chaser animation."""
-#     for j in range(256):
-#         for q in range(3):
-#             for i in range(0, strip.numPixels(), 3):
-#                 strip.setPixelColor(i+q, wheel((i+j) % 255))
-#             strip.show()
-#             time.sleep(wait_ms/1000.0)
-#             for i in range(0, strip.numPixels(), 3):
-#                 strip.setPixelColor(i+q, 0)
-#print(leds[1])
-for webColor in leds.keys():
-    print(leds[webColor][1])
 
 @app.route("/led/<color>/<state>")
 def set_led(color, state):
-    for webColor in leds.keys():
-        print([webColor])   
+    for webColor in leds.keys():   
         if color == webColor:
             if state == 'on':
     #           GPIO.output(leds[color], 1)
-                print(leds[webColor][0], leds[webColor][1], leds[webColor][2])
                 colorWipe(strip, Color(leds[webColor][0], leds[webColor][1], leds[webColor][2]))  # Red wipe
-                print("test")
+                print("randome Color?")
+                print(userColor)
                 return 'LED On: {}'.format(color)
             else:
     #           GPIO.output(leds[color], 0)
                 colorWipe(strip, Color(0, 0, 0))
+                print("if randome color click? im here?")
+                print(userColor)
                 return 'LED Off: {}'.format(color)
+
+        if color == "randomeColor":
+            randomG = random.randint(0, 255)
+            randomR = random.randint(0, 255)
+            randomB = random.randint(0, 255)
+            randomColor = (randomG, randomR, randomB)
+            #print(randomColor)
+            print("userColor?")
+            print(userColor)
+            setRandomColor(strip, Color(randomG, randomR, randomB))
+
 
             return 'Invalid LED: {}'.format(color)
 
 app.add_url_rule("/", "index", lambda: 'Hello World!')
 # Main program logic follows:
 if __name__ == '__main__':
-
 
     # Process arguments
     parser = argparse.ArgumentParser()
