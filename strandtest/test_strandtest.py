@@ -132,32 +132,3 @@ if __name__ == '__main__':
     print ('Press Ctrl-C to quit.')
     if not args.clear:
         print('Use "-c" argument to clear LEDs on exit')
-
-    # try:
-
-    #     while True:
-    #         # print ('Color wipe animations.')
-    #         # red = input("Please enter something: ")
-            
-    #         # blue = input("Please enter something: ")
-    #         # green = input("Please enter something: ")
-    #         # print("You entered: " + str(red))
-    #         # print("You entered: " + blue)
-    #         # print("You entered: " + green)
-    #         #colorWipe(strip, Color(red, blue, green))
-    #         # colorWipe(strip, Color(255, 0, 0))  # Red wipe
-    #         # colorWipe(strip, Color(0, 255, 0))  # Blue wipe
-    #         # colorWipe(strip, Color(0, 0, 255))  # Green wipe
-    #         # colorWipe(strip, Color(0, 255, 123))  # Test wipe
-    #         # print ('Theater chase animations.')
-    #         # theaterChase(strip, Color(127, 127, 127))  # White theater chase
-    #         # theaterChase(strip, Color(127,   0,   0))  # Red theater chase
-    #         # theaterChase(strip, Color(  0,   0, 127))  # Blue theater chase
-    #         # print ('Rainbow animations.')
-    #         # rainbow(strip)
-    #         # rainbowCycle(strip)
-    #         # theaterChaseRainbow(strip)
-
-    # except KeyboardInterrupt:
-    #     if args.clear:
-    #         colorWipe(strip, Color(0,0,0), 10)
