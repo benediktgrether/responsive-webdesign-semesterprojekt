@@ -34,6 +34,10 @@ userColor = 65280
 # print("User Color initialized")
 # print(userColor)
 
+usedColorStrip = {
+
+}
+
 
 
 # Define functions which animate LEDs in various ways.
@@ -70,8 +74,13 @@ def setRandomColor(strip, color, wait_ms=50):
             strip.setPixelColor((j - k), userColor)
             strip.show()
             time.sleep(wait_ms/1000.0)
-    strip.setPixelColor(randomInt, color)
-    strip.show()
+    usedColorStrip.update({randomInt : color}) 
+    print(usedColorStrip)
+    for keys, values in usedColorStrip.items():
+        print("get dic")
+        print(keys, values)
+        strip.setPixelColor(keys, values)
+        strip.show()
 
 
 @app.route("/led/<color>/<state>")
