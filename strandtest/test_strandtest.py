@@ -40,12 +40,8 @@ usedColorStrip = {
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
-    print(color)
     userColor.pop(0)
     userColor.append(color)
-    print("here is your user Color")
-    #print(userColor)
-    print(userColor)
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
@@ -55,8 +51,6 @@ def colorWipe(strip, color, wait_ms=50):
 
 def setRandomColor(strip, color, wait_ms=50):
     randomInt = random.randint(1, 60)
-    print("get userColor in Random function")
-    print(userColor)
     # strip.setPixelColor(randomInt, color)
     # strip.show()
     j = 59
@@ -65,21 +59,13 @@ def setRandomColor(strip, color, wait_ms=50):
             strip.setPixelColor((j - i), color)
             strip.show()
             time.sleep(wait_ms/1000.0)
-            #strip.setPixelColor((j - i), userColor)
-            #strip.show()
-            #time.sleep(wait_ms/1000.0)
-        #strip.setPixelColor(i, color)
-        #strip.show()
     for k in range(strip.numPixels()):
         if k <= j:
             strip.setPixelColor((j - k), userColor[0])
             strip.show()
             time.sleep(wait_ms/1000.0)
     usedColorStrip.update({randomInt : color}) 
-    print(usedColorStrip)
     for keys, values in usedColorStrip.items():
-        print("get dic")
-        print(keys, values)
         strip.setPixelColor(keys, values)
         strip.show()
 
