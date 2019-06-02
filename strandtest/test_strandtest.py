@@ -30,9 +30,7 @@ leds = {
     'green': (255, 0, 0)
 }
 
-userColor = 65280
-# print("User Color initialized")
-# print(userColor)
+userColor = [0]
 
 usedColorStrip = {
 
@@ -42,8 +40,11 @@ usedColorStrip = {
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
-    userColor = color
+    print(color)
+    userColor.pop(0)
+    userColor.append(color)
     print("here is your user Color")
+    #print(userColor)
     print(userColor)
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
@@ -71,7 +72,7 @@ def setRandomColor(strip, color, wait_ms=50):
         #strip.show()
     for k in range(strip.numPixels()):
         if k <= j:
-            strip.setPixelColor((j - k), userColor)
+            strip.setPixelColor((j - k), userColor[0])
             strip.show()
             time.sleep(wait_ms/1000.0)
     usedColorStrip.update({randomInt : color}) 
