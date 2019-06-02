@@ -70,10 +70,12 @@ def setup():
 def swLed(ev=None):
     global Led_status
     # Switch led status(on-->off; off-->on)
-    #Led_status = not Led_status
+    Led_status = not Led_status
     #GPIO.output(Led_status)
     if Led_status:
         print('LED OFF')
+    else:
+        print('LED ON')
         randomG = random.randint(0, 255)
         randomR = random.randint(0, 255)
         randomB = random.randint(0, 255)
@@ -81,9 +83,6 @@ def swLed(ev=None):
         print("userColor?")
         print(userColor)
         setRandomColor(strip, Color(randomG, randomR, randomB))
-        time.sleep(10)
-    else:
-        print('LED ON')
 #
 
 
