@@ -33,9 +33,9 @@ Led_status = True
 
 
 leds = {
-    'red': (0, 255, 0),
+    'red': (255, 0, 0),
     'blue': (0, 0, 255),
-    'green': (255, 0, 0)
+    'green': (0, 255, 0)
 }
 
 userColor = [0]
@@ -125,7 +125,7 @@ def set_led(color, state):
             if state == 'on':
 		    #           GPIO.output(leds[color], 1)
                 colorWipe(strip, Color(
-                    leds[webColor][0], leds[webColor][1], leds[webColor][2]))  # Red wipe
+                    leds[webColor][1], leds[webColor][0], leds[webColor][2]))  # Red wipe
                 print("randome Color?")
                 print(userColor)
                 return 'LED On: {}'.format(color)
