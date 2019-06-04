@@ -4,6 +4,7 @@
 #
 # Direct port of the Arduino NeoPixel library strandtest example.  Showcases
 # various animations on a strip of NeoPixels.
+# coding=utf-8
 
 import time
 from neopixel import *
@@ -11,6 +12,7 @@ import argparse
 from flask import Flask
 import random
 import RPi.GPIO as GPIO
+from socket import *
 
 app = Flask(__name__)
 
@@ -25,6 +27,13 @@ LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
+
+SERVER_IP   = "192.168.178.196"
+SERVER_PORT = 50007
+CLIENT_PORT = 50008
+PORT = 50007
+
+BUFSIZE = 1024
 
 # Button Pin Configuration
 ButtonPin = 24
@@ -284,6 +293,7 @@ def setup():
 
 def swLed(ev=None):
     global Led_status
+    #server()
     # Switch led status(on-->off; off-->on)
     Led_status = not Led_status
     #GPIO.output(Led_status)
@@ -300,11 +310,51 @@ def swLed(ev=None):
         setRandomColor(strip, Color(randomG, randomR, randomB))
 #
 
+def server():
+    
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.bind(("",CLIENT_PORT))                   
+
+    while 1:
+        
+        msg_out = str(userColor)
+        print(str(userColor))
+        if msg_out==".quit":
+           s.close()
+           break
+        
+        s.sendto(msg_out,(SERVER_IP,SERVER_PORT))
+        msg_in,(client_ip,client_port)=s.recvfrom(BUFSIZE)
+        break
+        print msg_in
+
+def responde():
+   
+    s = socket(AF_INET, SOCK_DGRAM)                              
+    s.bind(("", PORT))
+    print "UDP-Server gestartet..."
+
+    while 1:
+        
+        data, (client_ip,client_port) = s.recvfrom(BUFSIZE)      
+        
+        print "[%s %s]: %s" % (client_ip,client_port,data)       
+        
+        if data == "":
+           s.sendto("keine Daten",(client_ip,client_port))
+        elif data == ".stop":
+           s.sendto("Server beendet",(client_ip,client_port)) 
+           break
+        elif data != "" or data != ".stop":
+           s.sendto(data,(client_ip,client_port)) 
+
+    s.close()
+
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
-    userColor.pop(0)
-    userColor.append(color)
+    #userColor.pop(0)
+    #userColor.append(color)
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
@@ -342,7 +392,10 @@ def set_led(color, state):
                 colorWipe(strip, Color(
                     leds[webColor][1], leds[webColor][0], leds[webColor][2]))  # Red wipe
                 print("randome Color?")
-                print(userColor)
+                userColor.pop(0)
+                userColor.append(leds[webColor][1])
+                userColor.append(leds[webColor][0])
+                userColor.append(leds[webColor][2])
                 return 'LED On: {}'.format(color)
             else:
 		    #           GPIO.output(leds[color], 0)
@@ -352,13 +405,14 @@ def set_led(color, state):
                 return 'LED Off: {}'.format(color)
 
         if color == "randomeColor":
-            randomG = random.randint(0, 255)
-            randomR = random.randint(0, 255)
-            randomB = random.randint(0, 255)
-            #print(randomColor)
-            print("userColor?")
-            print(userColor)
-            setRandomColor(strip, Color(randomG, randomR, randomB))
+            # randomG = random.randint(0, 255)
+            # randomR = random.randint(0, 255)
+            # randomB = random.randint(0, 255)
+            # #print(randomColor)
+            # print("userColor?")
+            # print(userColor)
+            # setRandomColor(strip, Color(randomG, randomR, randomB))
+            server()
 
             return 'Invalid LED: {}'.format(color)
 
@@ -379,7 +433,9 @@ if __name__ == '__main__':
     # Intialize the library (must be called once before other functions).
     strip.begin()
     setup()
-    app.run(host='0.0.0.0')
+    #server()
+    #app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port='50008')
 
     print('Press Ctrl-C to quit.')
     if not args.clear:
