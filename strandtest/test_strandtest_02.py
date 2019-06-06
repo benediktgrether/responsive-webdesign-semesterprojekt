@@ -316,16 +316,11 @@ def server():
         for keys, values in userColor.items():
 
             msg_out = str(values)
-            print("Key Values")
-            print(values)
             s.sendto(msg_out,(SERVER_IP,SERVER_PORT))
 
         while i <= 2:
             msg_in,(client_ip,client_port)=s.recvfrom(BUFSIZE)
             getData.update({i : int(msg_in)})
-            print("get I an message Back?")
-            print(i)
-            print(msg_in)
             i = i + 1
         break
 
@@ -383,8 +378,6 @@ def set_led(color, state):
 		    #           GPIO.output(leds[color], 1)
                 colorWipe(strip, Color(
                     leds[webColor][1], leds[webColor][0], leds[webColor][2]))  # Red wipe
-                print("Startup userColor")
-                print(userColor)
                 userColor.pop(0)
                 userColor.pop(1)
                 userColor.pop(2)
@@ -395,8 +388,6 @@ def set_led(color, state):
             else:
 		    #           GPIO.output(leds[color], 0)
                 colorWipe(strip, Color(0, 0, 0))
-                print("if randome color click? im here?")
-                print(userColor)
                 return 'LED Off: {}'.format(color)
 
         if color == "randomeColor":

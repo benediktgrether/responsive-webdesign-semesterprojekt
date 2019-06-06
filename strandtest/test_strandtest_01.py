@@ -315,15 +315,10 @@ def responde():
             data, (client_ip,client_port) = s.recvfrom(BUFSIZE)      
         
             print "[%s %s]: %s" % (client_ip,client_port, data)
-            getData.update({i : int(data)})
-            print(data)
-            print("get i")
-            print(i)       
+            getData.update({i : int(data)})    
             if i == 2:
                 for keys, values in userColor.items():
                     msg_out = str(values)
-                    print("values for message back")
-                    print(values)
                     s.sendto(msg_out,(client_ip,client_port))
             
             i = i + 1 
@@ -397,8 +392,6 @@ def set_led(color, state):
             else:
 		    #           GPIO.output(leds[color], 0)
                 colorWipe(strip, Color(0, 0, 0))
-                print("if randome color click? im here?")
-                print(userColor)
                 return 'LED Off: {}'.format(color)
 
         if color == "randomeColor":
