@@ -300,28 +300,6 @@ def setup():
 	# and callback function to swLed
 	GPIO.add_event_detect(ButtonPin, GPIO.FALLING, callback=swLed)
 
-# Define a callback function for button callback
-
-
-def swLed(ev=None):
-    global Led_status
-    #server()
-    # Switch led status(on-->off; off-->on)
-    Led_status = not Led_status
-    #GPIO.output(Led_status)
-    if Led_status:
-        print('LED OFF')
-    else:
-        print('LED ON')
-        randomG = random.randint(0, 255)
-        randomR = random.randint(0, 255)
-        randomB = random.randint(0, 255)
-        #print(randomColor)
-        print("userColor?")
-        print(userColor)
-        setRandomColor(strip, Color(randomG, randomR, randomB))
-#
-
 def server():
 
     getData.pop(0)
@@ -341,11 +319,7 @@ def server():
             print("Key Values")
             print(values)
             s.sendto(msg_out,(SERVER_IP,SERVER_PORT))
-        if msg_out==".quit":
-           s.close()
-           break
-        
-        #s.sendto(msg_out,(SERVER_IP,SERVER_PORT))
+
         while i <= 2:
             msg_in,(client_ip,client_port)=s.recvfrom(BUFSIZE)
             getData.update({i : int(msg_in)})
@@ -357,28 +331,20 @@ def server():
 
     setRandomColor(strip, Color(getData[0], getData[1], getData[2]))
 
-def responde():
-   
-    s = socket(AF_INET, SOCK_DGRAM)                              
-    s.bind(("", PORT))
-    print "UDP-Server gestartet..."
+# Define a callback function for button callback
 
-    while 1:
-        
-        data, (client_ip,client_port) = s.recvfrom(BUFSIZE)      
-        
-        print "[%s %s]: %s" % (client_ip,client_port,data)       
-        
-        if data == "":
-           s.sendto("keine Daten",(client_ip,client_port))
-        elif data == ".stop":
-           s.sendto("Server beendet",(client_ip,client_port)) 
-           break
-        elif data != "" or data != ".stop":
-           s.sendto(data,(client_ip,client_port)) 
 
-    s.close()
-
+def swLed(ev=None):
+    global Led_status
+    #server()
+    # Switch led status(on-->off; off-->on)
+    Led_status = not Led_status
+    #GPIO.output(Led_status)
+    if Led_status:
+        print('LED OFF')
+    else:
+        print('LED ON')
+        #server()
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
@@ -408,6 +374,7 @@ def setRandomColor(strip, color, wait_ms=50):
         strip.show()
 
 
+
 @app.route("/led/<color>/<state>")
 def set_led(color, state):
     for webColor in leds.keys():
@@ -424,7 +391,6 @@ def set_led(color, state):
                 userColor.update({ 0 : leds[webColor][1]})
                 userColor.update({ 1 : leds[webColor][0]})
                 userColor.update({ 2 : leds[webColor][2]})
-                #print(userColor)
                 return 'LED On: {}'.format(color)
             else:
 		    #           GPIO.output(leds[color], 0)
@@ -434,13 +400,6 @@ def set_led(color, state):
                 return 'LED Off: {}'.format(color)
 
         if color == "randomeColor":
-            # randomG = random.randint(0, 255)
-            # randomR = random.randint(0, 255)
-            # randomB = random.randint(0, 255)
-            # #print(randomColor)
-            # print("userColor?")
-            # print(userColor)
-            # setRandomColor(strip, Color(randomG, randomR, randomB))
             server()
 
             return 'Invalid LED: {}'.format(color)
