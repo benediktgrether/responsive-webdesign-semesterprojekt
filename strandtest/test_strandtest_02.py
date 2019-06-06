@@ -28,7 +28,7 @@ LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
-SERVER_IP   = "192.168.178.196"
+SERVER_IP   = "192.168.178.92"
 SERVER_PORT = 50007
 CLIENT_PORT = 50008
 PORT = 50007
@@ -259,10 +259,22 @@ leds = {
     '05bdd2' : (5, 189, 210),
     '39cae1' : (57, 202, 225),
     '0a7423' : (10, 116, 35),
-    '6505d2' : (101, 5, 210)
+    '6505d2' : (101, 5, 210),
+    '4957dc' : (73, 87, 220)
 }
 
-userColor = [0]
+
+getData = {
+    0 : 0,
+    1 : 0, 
+    2 : 0
+}
+
+userColor = {
+    0 : 0,
+    1 : 0,
+    2 : 0
+}
 
 usedColorStrip = {
 
@@ -311,22 +323,39 @@ def swLed(ev=None):
 #
 
 def server():
+
+    getData.pop(0)
+    getData.pop(1)
+    getData.pop(2)
+
+    i = 0
     
     s = socket(AF_INET, SOCK_DGRAM)
     s.bind(("",CLIENT_PORT))                   
 
     while 1:
         
-        msg_out = str(userColor)
-        print(str(userColor))
+        for keys, values in userColor.items():
+
+            msg_out = str(values)
+            print("Key Values")
+            print(values)
+            s.sendto(msg_out,(SERVER_IP,SERVER_PORT))
         if msg_out==".quit":
            s.close()
            break
         
-        s.sendto(msg_out,(SERVER_IP,SERVER_PORT))
-        msg_in,(client_ip,client_port)=s.recvfrom(BUFSIZE)
+        #s.sendto(msg_out,(SERVER_IP,SERVER_PORT))
+        while i <= 2:
+            msg_in,(client_ip,client_port)=s.recvfrom(BUFSIZE)
+            getData.update({i : int(msg_in)})
+            print("get I an message Back?")
+            print(i)
+            print(msg_in)
+            i = i + 1
         break
-        print msg_in
+
+    setRandomColor(strip, Color(getData[0], getData[1], getData[2]))
 
 def responde():
    
@@ -353,8 +382,6 @@ def responde():
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
-    #userColor.pop(0)
-    #userColor.append(color)
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
@@ -364,8 +391,6 @@ def colorWipe(strip, color, wait_ms=50):
 
 def setRandomColor(strip, color, wait_ms=50):
     randomInt = random.randint(1, 60)
-    # strip.setPixelColor(randomInt, color)
-    # strip.show()
     j = 59
     for i in range(strip.numPixels()):
         if i <= j:
@@ -391,11 +416,15 @@ def set_led(color, state):
 		    #           GPIO.output(leds[color], 1)
                 colorWipe(strip, Color(
                     leds[webColor][1], leds[webColor][0], leds[webColor][2]))  # Red wipe
-                print("randome Color?")
+                print("Startup userColor")
+                print(userColor)
                 userColor.pop(0)
-                userColor.append(leds[webColor][1])
-                userColor.append(leds[webColor][0])
-                userColor.append(leds[webColor][2])
+                userColor.pop(1)
+                userColor.pop(2)
+                userColor.update({ 0 : leds[webColor][1]})
+                userColor.update({ 1 : leds[webColor][0]})
+                userColor.update({ 2 : leds[webColor][2]})
+                #print(userColor)
                 return 'LED On: {}'.format(color)
             else:
 		    #           GPIO.output(leds[color], 0)

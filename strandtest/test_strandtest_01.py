@@ -26,7 +26,8 @@ LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
-SERVER_IP   = "192.168.178.25"
+# IP from other Raspberry
+SERVER_IP   = "192.168.178.128" 
 SERVER_PORT = 50007
 CLIENT_PORT = 50008
 PORT = 50007
@@ -256,12 +257,24 @@ leds = {
     '05bdd2' : (5, 189, 210),
     '39cae1' : (57, 202, 225),
     '0a7423' : (10, 116, 35),
-    '6505d2' : (101, 5, 210)
+    '6505d2' : (101, 5, 210),
+    '4957dc' : (73, 87, 220)
 }
 
 userColor = [0]
 
-getData = [0]
+getData = {
+    0 : 0,
+    1 : 0, 
+    2 : 0
+}
+
+userColor = {
+    0 : 0,
+    1 : 0,
+    2 : 0
+}
+
 
 usedColorStrip = {
 
@@ -305,32 +318,50 @@ def server():
         
         msg_in,(client_ip,client_port)=s.recvfrom(BUFSIZE)
         print msg_in
+        
 
 def responde():
    
     s = socket(AF_INET, SOCK_DGRAM)                              
     s.bind(("", PORT))
     print "UDP-Server gestartet..."
+    getData.pop(0)
+    getData.pop(1)
+    getData.pop(2)
 
+    i = 0
     while 1:
+        if i <=2:
+            data, (client_ip,client_port) = s.recvfrom(BUFSIZE)      
         
-        data, (client_ip,client_port) = s.recvfrom(BUFSIZE)      
-        
-        print "[%s %s]: %s" % (client_ip,client_port,int(data))
-        # getData.pop(0)
-        # getData.append( data )
-        setRandomColor(strip, Color(data[0], data[1], data[2]))       
-        
-        if data == "":
-           s.sendto("keine Daten",(client_ip,client_port))
-        elif data == ".stop":
-           s.sendto("Server beendet",(client_ip,client_port)) 
-           break
-        elif data != "" or data != ".stop":
-           s.sendto(data,(client_ip,client_port)) 
-        break
+            print "[%s %s]: %s" % (client_ip,client_port, data)
+            getData.update({i : int(data)})
+            print(data)
+            print("get i")
+            print(i)       
+            if i == 2:
+                for keys, values in userColor.items():
+                    msg_out = str(values)
+                    print("values for message back")
+                    print(values)
+                    s.sendto(msg_out,(client_ip,client_port))
+            
+            i = i + 1
+            # if data == "":
+            #     s.sendto("keine Daten",(client_ip,client_port))
+            # elif data == ".stop":
+            #     s.sendto("Server beendet",(client_ip,client_port)) 
+            #     break
+            # elif data != "" or data != ".stop":
+            #     s.sendto(data,(client_ip,client_port)) 
+        else:
+            break
+        #break
 
     s.close()
+    setRandomColor(strip, Color(getData[0], getData[1], getData[2]))
+
+
 def swLed(ev=None):
     global Led_status
     server()
@@ -352,8 +383,6 @@ def swLed(ev=None):
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
-    userColor.pop(0)
-    userColor.append(color)
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
@@ -392,8 +421,12 @@ def set_led(color, state):
 		    #           GPIO.output(leds[color], 1)
                 colorWipe(strip, Color(
                     leds[webColor][1], leds[webColor][0], leds[webColor][2]))  # Red wipe
-                print("randome Color?")
-                print(userColor)
+                userColor.pop(0)
+                userColor.pop(1)
+                userColor.pop(2)
+                userColor.update({ 0 : leds[webColor][1]})
+                userColor.update({ 1 : leds[webColor][0]})
+                userColor.update({ 2 : leds[webColor][2]})
                 return 'LED On: {}'.format(color)
             else:
 		    #           GPIO.output(leds[color], 0)
