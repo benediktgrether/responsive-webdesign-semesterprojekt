@@ -28,7 +28,7 @@ LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
-SERVER_IP   = "192.168.178.92"
+SERVER_IP   = "192.168.3.100"
 SERVER_PORT = 50007
 CLIENT_PORT = 50008
 PORT = 50007
@@ -152,7 +152,7 @@ leds = {
     'd7fca3' : (215, 252, 163),
     'f2fce2' : (242, 252, 226),
     'e8ffc8' : (232, 255, 200),
-    'ff960c' : (25, 150, 12),
+    'ff960c' : (255, 150, 12),
     'ffbe0c' : (255, 190, 12),
     'f0f630' : (240, 246, 48),
     'dfd001' : (223, 208, 1),
@@ -300,7 +300,7 @@ def setup():
 	# and callback function to swLed
 	GPIO.add_event_detect(ButtonPin, GPIO.FALLING, callback=swLed)
 
-def server():
+def client():
 
     getData.pop(0)
     getData.pop(1)
@@ -331,7 +331,7 @@ def server():
 
 def swLed(ev=None):
     global Led_status
-    #server()
+    #client()
     # Switch led status(on-->off; off-->on)
     Led_status = not Led_status
     #GPIO.output(Led_status)
@@ -339,7 +339,14 @@ def swLed(ev=None):
         print('LED OFF')
     else:
         print('LED ON')
-        #server()
+        # randomG = random.randint(0, 255)
+        # randomR = random.randint(0, 255)
+        # randomB = random.randint(0, 255)
+        # #print(randomColor)
+        # print("userColor")
+        # print(userColor)
+        # setRandomColor(strip, Color(randomG, randomR, randomB))
+        client()
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
@@ -351,6 +358,7 @@ def colorWipe(strip, color, wait_ms=50):
 
 
 def setRandomColor(strip, color, wait_ms=50):
+    #backColor = (userColor[0], userColor[1], userColor[2])
     randomInt = random.randint(1, 60)
     j = 59
     for i in range(strip.numPixels()):
@@ -360,9 +368,11 @@ def setRandomColor(strip, color, wait_ms=50):
             time.sleep(wait_ms/1000.0)
     for k in range(strip.numPixels()):
         if k <= j:
-            strip.setPixelColor((j - k), userColor[0])
+            strip.setPixelColor((j - k), Color(userColor[0],userColor[1],userColor[2]))
             strip.show()
             time.sleep(wait_ms/1000.0)
+    print('User Color')
+    print(userColor[0])
     usedColorStrip.update({randomInt: color})
     for keys, values in usedColorStrip.items():
         strip.setPixelColor(keys, values)
@@ -384,6 +394,8 @@ def set_led(color, state):
                 userColor.update({ 0 : leds[webColor][1]})
                 userColor.update({ 1 : leds[webColor][0]})
                 userColor.update({ 2 : leds[webColor][2]})
+                print('User Color?')
+                print(userColor)
                 return 'LED On: {}'.format(color)
             else:
 		    #           GPIO.output(leds[color], 0)
@@ -391,7 +403,7 @@ def set_led(color, state):
                 return 'LED Off: {}'.format(color)
 
         if color == "randomeColor":
-            server()
+            client()
 
             return 'Invalid LED: {}'.format(color)
 
@@ -412,7 +424,7 @@ if __name__ == '__main__':
     # Intialize the library (must be called once before other functions).
     strip.begin()
     setup()
-    #server()
+    #client()
     #app.run(host='0.0.0.0')
     app.run(host='0.0.0.0', port='50008')
 

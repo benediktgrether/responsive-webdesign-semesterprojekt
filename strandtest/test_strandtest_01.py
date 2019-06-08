@@ -27,7 +27,7 @@ LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 # IP from other Raspberry
-SERVER_IP   = "192.168.178.128" 
+SERVER_IP   = "192.168.3.102" 
 SERVER_PORT = 50007
 CLIENT_PORT = 50008
 PORT = 50007
@@ -300,7 +300,7 @@ def setup():
 	# and callback function to swLed
 	GPIO.add_event_detect(ButtonPin, GPIO.FALLING, callback=swLed)
 
-def responde():
+def server():
    
     s = socket(AF_INET, SOCK_DGRAM)                              
     s.bind(("", PORT))
@@ -339,7 +339,7 @@ def swLed(ev=None):
         print('LED OFF')
     else:
         print('LED ON')
-        responde()
+        server()
 
 
 # Define functions which animate LEDs in various ways.
@@ -350,7 +350,7 @@ def colorWipe(strip, color, wait_ms=50):
         strip.show()
         time.sleep(wait_ms/1000.0)
     
-    #responde()
+    #server()
 
 
 def setRandomColor(strip, color, wait_ms=50):
@@ -363,7 +363,7 @@ def setRandomColor(strip, color, wait_ms=50):
             time.sleep(wait_ms/1000.0)
     for k in range(strip.numPixels()):
         if k <= j:
-            strip.setPixelColor((j - k), userColor[0])
+            strip.setPixelColor((j - k), Color(userColor[0],userColor[1],userColor[2]))
             strip.show()
             time.sleep(wait_ms/1000.0)
     usedColorStrip.update({randomInt: color})
@@ -371,7 +371,7 @@ def setRandomColor(strip, color, wait_ms=50):
         strip.setPixelColor(keys, values)
         strip.show()
     
-    responde()
+    server()
 
 
 @app.route("/led/<color>/<state>")
@@ -395,7 +395,7 @@ def set_led(color, state):
                 return 'LED Off: {}'.format(color)
 
         if color == "randomeColor":
-            responde()
+            server()
 
             return 'Invalid LED: {}'.format(color)
 
