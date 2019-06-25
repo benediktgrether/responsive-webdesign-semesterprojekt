@@ -17,7 +17,7 @@ from socket import *
 app = Flask(__name__)
 
 # LED strip configuration:
-LED_COUNT = 60      # Number of LED pixels.
+LED_COUNT = 32      # Number of LED pixels.
 LED_PIN = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -28,7 +28,7 @@ LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
-SERVER_IP   = "192.168.3.100"
+SERVER_IP   = "192.168.3.102"
 SERVER_PORT = 50007
 CLIENT_PORT = 50008
 PORT = 50007
@@ -359,8 +359,8 @@ def colorWipe(strip, color, wait_ms=50):
 
 def setRandomColor(strip, color, wait_ms=50):
     #backColor = (userColor[0], userColor[1], userColor[2])
-    randomInt = random.randint(1, 60)
-    j = 59
+    randomInt = random.randint(1, 32)
+    j = 31
     for i in range(strip.numPixels()):
         if i <= j:
             strip.setPixelColor((j - i), color)
